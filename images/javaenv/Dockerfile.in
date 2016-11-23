@@ -1,5 +1,5 @@
 FROM openjdk:8
-RUN wget https://services.gradle.org/distributions/gradle-2.12-bin.zip -P /tmp --quiet
+RUN http_proxy='http://http.example.com:8080' https_proxy=$http_proxy wget https://services.gradle.org/distributions/gradle-2.12-bin.zip -P /tmp --quiet
 RUN unzip -q /tmp/gradle-2.12-bin.zip -d /opt && rm /tmp/gradle-2.12-bin.zip
 RUN ln -s /opt/gradle-2.12/bin/gradle /usr/bin
 ADD payload/javashim.tar.bz2 /root

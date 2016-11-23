@@ -34,6 +34,49 @@ set -e
 BASEIMAGE_RELEASE=`cat /etc/hyperledger-baseimage-release`
 DEVENV_REVISION=`(cd /hyperledger/devenv; git rev-parse --short HEAD)`
 
+HTTP_PROXY_ADDR='http.example.org'
+HTTP_PROXY_PORT='8080'
+SOCKS_PROXY_ADDR='socks.example.org'
+SOCKS_PROXY_PORT='8080'
+
+# Set git proxy
+cat > /root/.gitconfig << EOF
+[http]
+	sslVerify = true
+[http "https://golang.org/"]
+	proxy = "socks5h://$SOCKS_PROXY_ADDR:$SOCKS_PROXY_PORT"
+[http "https://go.googlesource.com/"]
+	proxy = "socks5h://$SOCKS_PROXY_ADDR:$SOCKS_PROXY_PORT"
+[http "https://github.com/"]
+	proxy = "socks5h://$SOCKS_PROXY_ADDR:$SOCKS_PROXY_PORT"
+[http "https://gist.github.com/"]
+	proxy = "socks5h://$SOCKS_PROXY_ADDR:$SOCKS_PROXY_PORT"
+EOF
+
+cat > /home/vagrant/.gitconfig << EOF
+[http]
+	sslVerify = true
+[http "https://golang.org/"]
+	proxy = "socks5h://$SOCKS_PROXY_ADDR:$SOCKS_PROXY_PORT"
+[http "https://go.googlesource.com/"]
+	proxy = "socks5h://$SOCKS_PROXY_ADDR:$SOCKS_PROXY_PORT"
+[http "https://github.com/"]
+	proxy = "socks5h://$SOCKS_PROXY_ADDR:$SOCKS_PROXY_PORT"
+[http "https://gist.github.com/"]
+	proxy = "socks5h://$SOCKS_PROXY_ADDR:$SOCKS_PROXY_PORT"
+EOF
+
+# Set hosts (for potential DNS spoofing)
+cat >> /etc/hosts << 'EOF'
+# DNS spoofing list
+192.30.253.112		github.com
+192.30.253.113		github.com
+192.30.253.118		gist.github.com
+192.30.253.119		gist.github.com
+216.239.37.1		golang.org
+216.239.37.1		go.googlecode.com
+EOF
+
 # Install WARNING before we start provisioning so that it
 # will remain active.  We will remove the warning after
 # success
@@ -60,7 +103,7 @@ case "${DOCKER_STORAGE_BACKEND}" in
 esac
 
 # Install docker-compose
-curl -L https://github.com/docker/compose/releases/download/1.8.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+http_proxy="socks5h://$SOCKS_PROXY_ADDR:$SOCKS_PROXY_PORT" https_proxy=$http_proxy curl -L https://github.com/docker/compose/releases/download/1.8.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
 # Configure docker
@@ -71,6 +114,9 @@ service docker restart
 usermod -a -G docker vagrant # Add vagrant user to the docker group
 
 # Test docker
+docker load < $GOPATH/src/github.com/hyperledger/fabric/busybox-latest.tar.gz
+docker load < $GOPATH/src/github.com/hyperledger/fabric/hyperledger-fabric-baseimage-x86_64-0.2.1.tar.gz
+docker load < $GOPATH/src/github.com/hyperledger/fabric/openjdk-8.tar.gz
 docker run --rm busybox echo All good
 
 # Set Go environment variables needed by other scripts
@@ -87,7 +133,7 @@ sudo chown -R vagrant:vagrant /var/hyperledger
 # filesystem) and then ensure we have a fresh set of our go-tools.
 # NOTE: This must be done before the chown below
 cd $GOPATH/src/github.com/hyperledger/fabric
-make clean gotools
+http_proxy="http://$HTTP_PROXY_ADDR:$HTTP_PROXY_PORT" https_proxy=$http_proxy make clean gotools
 
 # Ensure permissions are set for GOPATH
 sudo chown -R vagrant:vagrant $GOPATH

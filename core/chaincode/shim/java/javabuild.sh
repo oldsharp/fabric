@@ -19,6 +19,8 @@
 set -e
 PARENTDIR=$(pwd)	
 
+HTTP_PROXY_ADDR='http.example.org'
+HTTP_PROXY_PORT='8080'
 
-gradle -q -b ${PARENTDIR}/core/chaincode/shim/java/build.gradle clean
-gradle -q -b ${PARENTDIR}/core/chaincode/shim/java/build.gradle build
+gradle -Dhttp.proxyHost=$HTTP_PROXY_ADDR -Dhttp.proxyPort=$HTTP_PROXY_PORT -Dhttps.proxyHost=$HTTP_PROXY_ADDR -Dhttps.proxyPort=$HTTP_PROXY_PORT -q -b ${PARENTDIR}/core/chaincode/shim/java/build.gradle clean
+gradle -Dhttp.proxyHost=$HTTP_PROXY_ADDR -Dhttp.proxyPort=$HTTP_PROXY_PORT -Dhttps.proxyHost=$HTTP_PROXY_ADDR -Dhttps.proxyPort=$HTTP_PROXY_PORT -q -b ${PARENTDIR}/core/chaincode/shim/java/build.gradle build

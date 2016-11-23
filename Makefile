@@ -54,6 +54,11 @@ OS=$(shell uname)
 CHAINTOOL_RELEASE=v0.10.0
 BASEIMAGE_RELEASE=$(shell cat ./.baseimage-release)
 
+HTTP_PROXY_ADDR="http.example.org"
+HTTP_PROXY_PORT="8080"
+SOCKS_PROXY_ADDR="socks.example.org"
+SOCKS_PROXY_PORT="8080"
+
 export GO_LDFLAGS
 
 DOCKER_TAG=$(ARCH)-$(PROJECT_VERSION)
@@ -63,7 +68,10 @@ ifneq ($(OS),Darwin)
 DOCKER_FLAGS=--user=$(shell id -u)
 endif
 
-DRUN = docker run -i --rm $(DOCKER_FLAGS) \
+DRUN = docker run -i --rm \
+	-e "http_proxy=http://$(HTTP_PROXY_ADDR):$(HTTP_PROXY_PORT)" \
+	-e "https_proxy=http://$(HTTP_PROXY_ADDR):$(HTTP_PROXY_PORT)" \
+	$(DOCKER_FLAGS) \
 	-v $(abspath .):/opt/gopath/src/$(PKGNAME) \
 	-w /opt/gopath/src/$(PKGNAME)
 
@@ -127,7 +135,7 @@ linter: testenv
 build/bin/chaintool: Makefile
 	@echo "Installing chaintool"
 	@mkdir -p $(@D)
-	curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/$(CHAINTOOL_RELEASE)/chaintool > $@
+	http_proxy="socks5h://$(SOCKS_PROXY_ADDR):$(SOCKS_PROXY_PORT)" https_proxy="socks5h://$(SOCKS_PROXY_ADDR):$(SOCKS_PROXY_PORT)" curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/$(CHAINTOOL_RELEASE)/chaintool > $@
 	chmod +x $@
 
 %/bin/chaintool: build/bin/chaintool
