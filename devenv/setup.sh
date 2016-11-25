@@ -34,10 +34,10 @@ set -e
 BASEIMAGE_RELEASE=`cat /etc/hyperledger-baseimage-release`
 DEVENV_REVISION=`(cd /hyperledger/devenv; git rev-parse --short HEAD)`
 
-HTTP_PROXY_ADDR='http.example.org'
-HTTP_PROXY_PORT='8080'
-SOCKS_PROXY_ADDR='socks.example.org'
-SOCKS_PROXY_PORT='8080'
+HTTP_PROXY_ADDR='172.16.0.101'
+HTTP_PROXY_PORT='8086'
+SOCKS_PROXY_ADDR='172.16.0.101'
+SOCKS_PROXY_PORT='8087'
 
 # Set git proxy
 cat > /root/.gitconfig << EOF
