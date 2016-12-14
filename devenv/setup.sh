@@ -70,13 +70,17 @@ sed -i.bak '/^DOCKER_OPTS=/{h;s|=.*|=\"'"${DOCKER_OPTS}"'\"|};${x;/^$/{s||DOCKER
 service docker restart
 usermod -a -G docker vagrant # Add vagrant user to the docker group
 
-# Test docker
-docker run --rm busybox echo All good
-
 # Set Go environment variables needed by other scripts
 export GOPATH="/opt/gopath"
 export GOROOT="/opt/go/"
 PATH=$GOROOT/bin:$GOPATH/bin:$PATH
+
+# Test docker
+docker load < $GOPATH/src/github.com/hyperledger/fabric/.private/images/busybox-latest.tar.gz
+docker load < $GOPATH/src/github.com/hyperledger/fabric/.private/images/hyperledger-fabric-baseimage-x86_64-$BASEIMAGE_RELEASE.tar.gz
+docker load < $GOPATH/src/github.com/hyperledger/fabric/.private/images/hyperledger-fabric-baseos-x86_64-$BASEIMAGE_RELEASE.tar.gz
+docker load < $GOPATH/src/github.com/hyperledger/fabric/.private/images/openjdk-8.tar.gz
+docker run --rm busybox echo All good
 
 # Create directory for the DB
 sudo mkdir -p /var/hyperledger
