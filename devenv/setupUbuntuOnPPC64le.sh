@@ -85,5 +85,5 @@ cd - ; rm -rf /tmp/rocksdb
 apt-get -y install python-pip
 pip install --upgrade pip
 pip install behave nose docker-compose
-
-pip install -I flask==0.10.1 python-dateutil==2.2 pytz==2014.3 pyyaml==3.10 couchdb==1.0 flask-cors==2.0.1 requests==2.4.3 grpcio==0.13.1 pyOpenSSL==16.2.0 sha3==0.2.1
+pip install --upgrade grpcio-tools
+pip install -I flask==0.10.1 python-dateutil==2.2 pytz==2014.3 pyyaml==3.10 couchdb==1.0 flask-cors==2.0.1 requests==2.4.3 pyopenssl==16.2.0 pysha3==1.0b1 ecdsa==0.13 python-slugify==1.2.1
