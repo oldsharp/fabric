@@ -43,9 +43,8 @@ var testWG = sync.WaitGroup{}
 
 func init() {
 	aliveTimeInterval := time.Duration(1000) * time.Millisecond
-	discovery.SetAliveTimeInternal(aliveTimeInterval)
-	discovery.SetAliveExpirationCheckInterval(aliveTimeInterval)
-	discovery.SetExpirationTimeout(aliveTimeInterval * 10)
+	discovery.SetAliveTimeInterval(aliveTimeInterval)
+	discovery.SetAliveExpirationTimeout(aliveTimeInterval * 10)
 	discovery.SetReconnectInterval(aliveTimeInterval * 5)
 
 	testWG.Add(7)
